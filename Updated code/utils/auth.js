@@ -38,4 +38,4 @@ function generateToken(UserInfo) {
 
 
 module.exports.generateToken = generateToken;
-module.exports.verifyToeken = verifyToken;
+module.exports.verifyToken = verifyToken;
