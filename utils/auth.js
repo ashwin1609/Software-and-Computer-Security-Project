@@ -2,9 +2,8 @@
 const jwt = require('jsonwebtoken');
 
 function generateToken(UserInfo) {
-    if(!user){
+    if(!UserInfo){
         return null;
-
     }
 
     // you can also hardcode the secret key if you want at 33.36
@@ -13,7 +12,7 @@ function generateToken(UserInfo) {
     })
 }
 
-    function verifyToken(username, toeken) {
+    function verifyToken(username, token) {
         return jwt.verify(token, process.env.JWT_SECRET, (error, response) =>{
             if (error){
                 return {

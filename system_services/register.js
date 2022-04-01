@@ -3,7 +3,7 @@ AWS.config.update({
     region: 'us-east-1'
 })
 const dynamodb = new AWS.DynamoDB.DocumentClient();
-const userTable = 'UserInfo';
+const UserTable = 'UserTable';
 const util = require('../utils/util')
 const bcrypt = require('bcryptjs');
 
@@ -19,7 +19,7 @@ async function register(UserInfo){
         })
     }
 
-    const dynamoUser = await getUser(username);
+    const dynamoUser = await getUser(username.toLowerCase().trim());
     if(dynamoUser && dynamoUser.username){
         return util.buildResponse(401, {
             message: 'The following username exists in our database '
@@ -44,8 +44,8 @@ async function register(UserInfo){
 }
 
 async function getUser(username) {
-    const param = {
-        TableName: userTable,
+    const params = {
+        TableName: UserTable,
         Key: {
             username: username
         }
@@ -60,7 +60,7 @@ async function getUser(username) {
 
 async function saveUser(user){
     const params = {
-        TableName: userTable,
+        TableName: serTable,
         Item: user
     }
     return await dynamodb.put(params).promise().then(() => {

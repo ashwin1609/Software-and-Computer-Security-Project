@@ -12,7 +12,7 @@ if(!requestBody.user || !requestBody.user.username || !requestBody.token) {
 
     const user = requestBody.user;
     const token = requestBody.token;
-    const verification = auth.verifyToeken(user.username, token);
+    const verification = auth.verifyToken(user.username, token);
     if(!verification.verified){
         return util.buildResponse(401, verification);
     } 
