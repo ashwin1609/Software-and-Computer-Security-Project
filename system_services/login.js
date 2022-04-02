@@ -15,27 +15,26 @@ async function login(user) {
     if(!user || !username || !password){
         return util.buildResponse(401,{
             message: 'Username and Password are required'
-        }); // He forget in the video 30:58
+        })
    }
 
    const dynamoUser = await getUser(username.toLowercase().trim())
     if(!dynamoUser ||! dynamoUser.username) {
-        return util.buildResponse(403 ,
-            { message: 'user does not exist'});
+        return util.buildResponse(403 , { message: 'user does not exist'});
     }
 
     if(!bcrypt.compareSync(password, dynamoUser.password)){
         return util.buildResponse( 403, { message: 'password  is incorrect '});
     }
 
-    const UserInfo = {
+    const userInfo = {
         username: dynamoUser.username,
         name: dynamoUser.name
     }
 
-    const token = auth.generateToken(UserInfo)
+    const token = auth.generateToken(userInfo)
     const response = {
-        user:UserInfo,
+        user:userInfo,
         token: token
     }
 
@@ -44,7 +43,7 @@ async function login(user) {
 
 async function getUser(username) {
     const params = {
-        TableName: UserTable,
+        TableName: userTable,
         Key: {
             username: username
         }
@@ -53,7 +52,7 @@ async function getUser(username) {
     return await dynamodb.get(params).promise().then(response => {
         return response.Item;
     }, error => {
-        console.error("There is an error:", error);
+        console.error("There is an error getting the user:", error);
     })
 }
 

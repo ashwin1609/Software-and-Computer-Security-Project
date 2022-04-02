@@ -1,13 +1,11 @@
-// using json webtoken
 const jwt = require('jsonwebtoken');
 
-function generateToken(UserInfo) {
-    if(!UserInfo){
+function generateToken(userInfo) {
+    if(!userInfo){
         return null;
     }
 
-    // you can also hardcode the secret key if you want at 33.36
-    return jwt.sign(UserInfo, process.env.JWT_SECRET, {
+    return jwt.sign(userInfo, process.env.JWT_SECRET, {
         expiresIN: '1h'
     })
 }

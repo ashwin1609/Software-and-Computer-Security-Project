@@ -3,15 +3,15 @@ AWS.config.update({
     region: 'us-east-1'
 })
 const dynamodb = new AWS.DynamoDB.DocumentClient();
-const UserTable = 'UserTable';
+const userTable = 'UserTable';
 const util = require('../utils/util')
 const bcrypt = require('bcryptjs');
 
-async function register(UserInfo){
-    const name = UserInfo.name;
-    const email = UserInfo.email;
-    const username = UserInfo.username;
-    const password = UserInfo.password;
+async function register(userInfo){
+    const name = userInfo.name;
+    const email = userInfo.email;
+    const username = userInfo.username;
+    const password = userInfo.password;
 
     if(!username || !name || !email || !password){
         return util.buildResponse(401, {
@@ -26,16 +26,16 @@ async function register(UserInfo){
         })
     }
 
-    const encryptedPassword = bcrypt.hashSync(password.trim(), 10);
+    const encryptedPW = bcrypt.hashSync(password.trim(), 10);
     const user = {
         name: name,
         email: email,
         username: username.toLowerCase().trim(),
-        password: encryptedPassword
+        password: encryptedPW
     }
 
-    const storeUserData = await saveUser(user);
-    if(!storeUserData){
+    const storeUserResponse = await saveUser(user);
+    if(!storeUserResponse){
         return util.buildResponse(503, {
             message: 'Server Error. Please try again later'
         })
@@ -45,29 +45,29 @@ async function register(UserInfo){
 
 async function getUser(username) {
     const params = {
-        TableName: UserTable,
+        TableName: userTable,
         Key: {
-            username: username
+            username: username 
         }
     }
 
     return await dynamodb.get(params).promise().then(response => {
         return response.Item;
     }, error => {
-        console.error("There is an error:", error);
+        console.error("There is an error getting user:", error);
     })
 }
 
 async function saveUser(user){
     const params = {
-        TableName: serTable,
+        TableName: userTable,
         Item: user
     }
     return await dynamodb.put(params).promise().then(() => {
         return true;
     }, error => {
-        console.error("There is an error:", error);
-    })
+        console.error("There is an error saving user:", error)
+    });
 }
 
 module.exports.register = register;

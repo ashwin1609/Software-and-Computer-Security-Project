@@ -18,7 +18,7 @@ exports.handler = async (event) => {
 
         case event.httpMethod === 'POST' && event.path === registerPage:
             const registerBody =JSON.parse(event.body);
-            response = await registerService.register(registerBody);
+            response = await registerService.register(registerBody); 
             break;
 
         case event.httpMethod === 'POST' && event.path === loginPage:
@@ -28,7 +28,7 @@ exports.handler = async (event) => {
 
         case event.httpMethod === 'POST' && event.path === authPage:
             const authBody = JSON.parse(event.body);
-            response = await authenticationService.authentication(authBody); // i think he forget to write await in this line 35.21
+            response = authenticationService.authentication(authBody); 
             break;
         default:
         response = util.buildResponse(404, 'Page not Found!!!');
