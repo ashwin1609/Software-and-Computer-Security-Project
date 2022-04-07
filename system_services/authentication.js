@@ -1,4 +1,4 @@
-const util = require('../utils/util');
+const util = require('./util');
 const auth = require('../utils/auth');
 
 function authentication(requestBody){
