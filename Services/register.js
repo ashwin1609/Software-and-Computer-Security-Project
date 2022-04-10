@@ -28,31 +28,52 @@ async function register(values){
     const registeredUserName = await getUser(username);
     
     // Condition to check if the username entered already exists in our database.
-    // If the username exists, then the following message is printed 
-    if(registeredUserName && registeredUserName.username){
-        return buildResponse(401, {
-            message: 'The username you have entered exists in our database. Please select a new username!!!! '
-        })
+    // If the username exists, then the following message is printed
+    if(registeredUserName){
+        if(registeredUserName.username){
+            return buildResponse(401, {
+                message: 'The username you have entered exists in our database. Please select a new username!!!! '
+            })
+        }
     }
     
     // Stores the password in an encrypted manner in the database
-    const passwordEncryption = bcrypt.hashSync(password.trim(), 10);
-    const Registeringuser = {
+    const passwordEncryption = bcrypt.hashSync(password.trim(), 15);
+    const RegisteringUser = {
         name: name,
         email: email,
         username: username,
         password: passwordEncryption
     }
 
-    const storeUserResponse = await saveUser(Registeringuser);
-    if(!storeUserResponse){
+    // Function call to save user information
+    const storeUserInformation = await saveUser(RegisteringUser);
+    // Returns a 503 response code if the system is not able to add information to the dynamoDB
+    if(!storeUserInformation){
         return buildResponse(503, {
-            message: 'Server Error. Please try again later'
+            message: 'Server Error. User information was not added to the Database.'
         })
     }
-    return buildResponse(200, { message: 'User was added Successfully'});
+    // returns a 200 response code if user was successfully registered
+    return buildResponse(200, { message: 'User information was added to the Database'});
 }
 
+// Asynchronous function that stores user information to the DynamoDB database.
+// Takes the table name and the body elements as its parameter.
+async function saveUser(user){
+    const params = {
+        TableName: Table,
+        Item: user
+    }
+    return await dynamodb.put(params).promise().then(() => {
+        return true;
+    }, error => {
+        console.error("The user information was not saved!!!", error)
+    });
+}
+
+// Asynchronous function that gets user information from DynamoDB.
+// Takes the table name and username as the parameters. The username is considered as the key to query for information. 
 async function getUser(username) {
     const params = {
         TableName: Table,
@@ -64,20 +85,8 @@ async function getUser(username) {
     return await dynamodb.get(params).promise().then(response => {
         return response.Item;
     }, error => {
-        console.error("There is an error getting user:", error);
+        console.error("The system is not able to return user information. Please try again later.", error);
     })
-}
-
-async function saveUser(user){
-    const params = {
-        TableName: Table,
-        Item: user
-    }
-    return await dynamodb.put(params).promise().then(() => {
-        return true;
-    }, error => {
-        console.error("There is an error saving user:", error)
-    });
 }
 
 // To return the error message in a JSON format 
